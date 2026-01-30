@@ -7,7 +7,7 @@ from src.service.omr_service import process_image_bytes, result_to_json
 
 app = Flask(__name__)
 
-BASE_DIR = Path(__file__).resolve().parent.parent
+BASE_DIR = Path(__file__).resolve().parent
 TEMPLATE_PATH = BASE_DIR / "inputs" / "template.json"
 
 @app.route("/omr/scan", methods=["POST"])
@@ -25,7 +25,6 @@ def check_omr():
 
     try:
         image_bytes = base64.b64decode(image_b64)
-
         result = process_image_bytes(
             image_bytes=image_bytes,
             filename="zoho_upload.jpg",
