@@ -18,20 +18,35 @@ except Exception:
 
 @dataclass
 class ImageMetrics:
-    # TODO: Move TEXT_SIZE, etc here and find a better class name
-    window_width, window_height = monitor_window.width, monitor_window.height
-    # for positioning image windows
-    window_x, window_y = 0, 0
-    reset_pos = [0, 0]
+    window_width: int = 0
+    window_height: int = 0
+    window_x: int = 0
+    window_y: int = 0
+    reset_pos: list = None
+
+    def __init__(self, monitor_window=None):
+        if monitor_window:
+            self.window_width = monitor_window.width
+            self.window_height = monitor_window.height
+        else:
+            # Headless-safe defaults
+            self.window_width = 0
+            self.window_height = 0
+
+        self.window_x = 0
+        self.window_y = 0
+        self.reset_pos = [0, 0]
 
 
 class InteractionUtils:
     """Perform primary functions such as displaying images and reading responses"""
 
-    image_metrics = ImageMetrics()
+    image_metrics = ImageMetrics(monitor_window)
 
     @staticmethod
     def show(name, origin, pause=1, resize=False, reset_pos=None, config=None):
+        if IS_HEADLESS:
+            return
         image_metrics = InteractionUtils.image_metrics
         if origin is None:
             logger.info(f"'{name}' - NoneType image to show!")
