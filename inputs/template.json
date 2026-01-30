@@ -1,0 +1,51 @@
+{
+  "pageDimensions": [1000, 1300],
+  "bubbleDimensions": [25, 25],
+  "customLabels": {},
+  "fieldBlocks": {
+    "Roll": {
+      "fieldType": "QTYPE_INT",
+      "fieldLabels": ["roll1..13"],
+      "bubblesGap": 30.5,
+      "labelsGap": 38.5,
+      "origin": [200, 298]
+    },
+    "MCQBlock1": {
+      "fieldType": "QTYPE_MCQ4",
+      "origin": [125, 630],
+      "fieldLabels": ["q1..10"],
+      "bubblesGap": 37,
+      "labelsGap": 30
+    },
+    "MCQBlock2": {
+      "fieldType": "QTYPE_MCQ4",
+      "origin": [355, 630],
+      "fieldLabels": ["q11..20"],
+      "bubblesGap": 37,
+      "labelsGap": 30
+    },
+    "MCQBlock3": {
+      "fieldType": "QTYPE_MCQ4",
+      "origin": [585, 630],
+      "fieldLabels": ["q21..30"],
+      "bubblesGap": 37,
+      "labelsGap": 30
+    },
+    "MCQBlock4": {
+      "fieldType": "QTYPE_MCQ4",
+      "origin": [815, 630],
+      "fieldLabels": ["q31..40"],
+      "bubblesGap": 37,
+      "labelsGap": 30
+    }
+  },
+  "preProcessors": [
+    {
+      "name": "CropOnMarkers",
+      "options": {
+        "relativePath": "omr_marker.jpg",
+        "sheetToMarkerWidthRatio": 17
+      }
+    }
+  ]
+}

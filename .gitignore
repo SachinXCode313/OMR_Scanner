@@ -1,0 +1,24 @@
+# Any directory starting with a dot
+**/\.*/
+# Except .github
+!.github/
+
+# Ignore outputs (generated data)
+outputs/*
+
+# Ignore sample/user inputs, but keep template
+inputs/*
+!inputs/template.json
+
+# Python junk
+**/__pycache__/
+*.pyc
+
+# Virtual environments
+venv/
+
+# OS junk
+**/.DS_Store
+
+# Wiki
+OMRChecker.wiki/
