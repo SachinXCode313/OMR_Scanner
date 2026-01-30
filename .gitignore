@@ -9,6 +9,7 @@ outputs/*
 # Ignore sample/user inputs, but keep template
 inputs/*
 !inputs/template.json
+!inputs/omr_marker.jpg
 
 # Python junk
 **/__pycache__/
