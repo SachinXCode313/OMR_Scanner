@@ -1,99 +1,52 @@
-"""
-
- OMRChecker
-
- Author: Udayraj Deshmukh
- Github: https://github.com/Udayraj123
-
-"""
-
-import argparse
-import sys
+import base64
+import os
+from flask import Flask, request, jsonify
 from pathlib import Path
 
-from src.entry import entry_point
-from src.logger import logger
+from src.service.omr_service import process_image_bytes, result_to_json
 
+app = Flask(__name__)
 
-def parse_args():
-    # construct the argument parse and parse the arguments
-    argparser = argparse.ArgumentParser()
+BASE_DIR = Path(__file__).resolve().parent.parent
+TEMPLATE_PATH = BASE_DIR / "inputs" / "template.json"
 
-    argparser.add_argument(
-        "-i",
-        "--inputDir",
-        default=["inputs"],
-        # https://docs.python.org/3/library/argparse.html#nargs
-        nargs="*",
-        required=False,
-        type=str,
-        dest="input_paths",
-        help="Specify an input directory.",
-    )
+@app.route("/omr/scan", methods=["POST"])
+def check_omr():
+    data = request.get_json(silent=True)
 
-    argparser.add_argument(
-        "-d",
-        "--debug",
-        required=False,
-        dest="debug",
-        action="store_false",
-        help="Enables debugging mode for showing detailed errors",
-    )
+    if not data or "image_base64" not in data:
+        return jsonify({"error": "image_base64 required"}), 400
 
-    argparser.add_argument(
-        "-o",
-        "--outputDir",
-        default="outputs",
-        required=False,
-        dest="output_dir",
-        help="Specify an output directory.",
-    )
+    image_b64 = data["image_base64"]
 
-    argparser.add_argument(
-        "-a",
-        "--autoAlign",
-        required=False,
-        dest="autoAlign",
-        action="store_true",
-        help="(experimental) Enables automatic template alignment - \
-        use if the scans show slight misalignments.",
-    )
+    # 🔥 Strip data URI if Zoho sends it
+    if "," in image_b64:
+        image_b64 = image_b64.split(",")[1]
 
-    argparser.add_argument(
-        "-l",
-        "--setLayout",
-        required=False,
-        dest="setLayout",
-        action="store_true",
-        help="Set up OMR template layout - modify your json file and \
-        run again until the template is set.",
-    )
+    try:
+        image_bytes = base64.b64decode(image_b64)
 
-    (
-        args,
-        unknown,
-    ) = argparser.parse_known_args()
-
-    args = vars(args)
-
-    if len(unknown) > 0:
-        logger.warning(f"\nError: Unknown arguments: {unknown}", unknown)
-        argparser.print_help()
-        exit(11)
-    return args
-
-
-def entry_point_for_args(args):
-    if args["debug"] is True:
-        # Disable tracebacks
-        sys.tracebacklimit = 0
-    for root in args["input_paths"]:
-        entry_point(
-            Path(root),
-            args,
+        result = process_image_bytes(
+            image_bytes=image_bytes,
+            filename="zoho_upload.jpg",
+            template_path=TEMPLATE_PATH,
         )
+
+        return jsonify(result_to_json(result))
+
+    except Exception as e:
+        return jsonify({"error": "OMR processing failed"}), 500
+
+
+@app.route("/omr/ping", methods=["GET"])
+def health_check():
+    return jsonify({
+        "status": "awake",
+        "service": "omr-scanner"
+    }), 200
 
 
 if __name__ == "__main__":
-    args = parse_args()
-    entry_point_for_args(args)
+    # port = int(os.environ.get("PORT", 10000))
+    app.run(debug=True)
+

@@ -1,4 +1,5 @@
 import base64
+import os
 from flask import Flask, request, jsonify
 from pathlib import Path
 
@@ -34,7 +35,18 @@ def check_omr():
         return jsonify(result_to_json(result))
 
     except Exception as e:
-        return jsonify({"error": str(e)}), 500
+        return jsonify({"error": "OMR processing failed"}), 500
 
 
+@app.route("/omr/ping", methods=["GET"])
+def health_check():
+    return jsonify({
+        "status": "awake",
+        "service": "omr-scanner"
+    }), 200
+
+
+if __name__ == "__main__":
+    port = int(os.environ.get("PORT", 10000))
+    app.run(host="0.0.0.0", port=port)
 
