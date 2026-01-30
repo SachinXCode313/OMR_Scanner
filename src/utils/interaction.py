@@ -6,7 +6,14 @@ from screeninfo import get_monitors
 from src.logger import logger
 from src.utils.image import ImageUtils
 
-monitor_window = get_monitors()[0]
+import os
+
+IS_HEADLESS = os.environ.get("RENDER") == "true"
+
+try:
+    monitor_window = get_monitors()[0]
+except Exception:
+    monitor_window = None
 
 
 @dataclass
